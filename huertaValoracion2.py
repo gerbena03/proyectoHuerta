@@ -1,6 +1,30 @@
 import datetime
 from database import Database
 from datetime import date
+import psutil
+import os
+
+
+process = psutil.Process(os.getpid())
+
+
+
+def mostrar_memoria(db, momento):
+
+    memoria = process.memory_info().rss / 1024 / 1024
+
+    print(f"\n[MEMORIA USADA: {memoria:.2f} MB]\n")
+
+    sql = """
+    INSERT INTO memoria_monitor(momento, memoriaMB)
+    VALUES (%s, %s)
+    """
+
+    datos = (momento, memoria)
+
+    db.ejecutarConsultas(sql, datos)
+
+
 """clase que genera objetos hortalizas a sembrar con sus caracteristicas fenologicas 
     fechas de siembra, cosecha, labores culturales según la epoca del año y según el tamaño del terreno a sembrar,
      establecido por el usuario determine un rendimiento promedio"""
@@ -83,7 +107,9 @@ class Horticultura():
             valor=int(input(f"Seleccione el n° de la variedad a trabajar: {self.getPrimaveraVerano()}\n"))
             sql="SELECT nombreVariedad FROM variedad WHERE idvariedad="+str(valor)
             valores=self.db.obtenerResultados(sql)
-            
+            mostrar_memoria(self.db, "despues de consultas")
+
+
             if valores:            
                    for i in valores:
                     self.variedad=i
@@ -95,6 +121,7 @@ class Horticultura():
             valor=int(input(f"Seleccione el n° la variedad a trabajar: {self.getOtonoInvierno()}\n"))
             sql="SELECT nombreVariedad FROM variedad WHERE idvariedad="+str(valor)
             valores=self.db.obtenerResultados(sql)
+            mostrar_memoria(self.db, "despues de consultas")
             
             if valores:            
                    for i in valores:
@@ -102,7 +129,7 @@ class Horticultura():
             self.setIdVariedad(valor)        
             print("------------------")
 
-    
+   
     def menuLabores(self):
         """función que muestra menú labores
         Args: eleccion(int): Menú 2
@@ -134,7 +161,9 @@ class Horticultura():
             sql=("INSERT INTO labores(variedad, actividad, fecha, parcela) VALUES (%s,%s,%s,%s)")
             datos=(self.idVariedad, labor,solicitudFecha(),solicitudParcela())
             self.db.ejecutarConsultas(sql,datos)
-            
+            mostrar_memoria(self.db, "despues insertar")
+
+        
                    
         while True:
             print("------------------")
@@ -227,6 +256,8 @@ class Horticultura():
                 WHERE actividad.idActividad=labores.actividad AND labores.parcela=parcela.idParcela 
                 AND labores.variedad=""" +str(self.idVariedad) 
                 valores=self.db.obtenerResultados(sql)
+
+                mostrar_memoria(self.db, "despues de consultas")
                 
                 if valores:
                     for i in valores:
@@ -255,13 +286,26 @@ class Horticultura():
                 if sql:
                     self.db.ejecutarConsultas(sql)
                     print("Los datos fueron borrados con éxito")
+                    mostrar_memoria(self.db, "despues de borrar")
                 print("------------------")
+                
             elif opcionMenu2==4:              
                self.variedadHortaliza(principal())
             elif opcionMenu2==5:
                 self.db.cerrarConexion()              
                 break
                 
+            
+
+
+
+
+
+
+
+
+
+    
             
 
 
