@@ -3,6 +3,7 @@ from database import Database
 from datetime import date
 import psutil
 import os
+import gc
 
 cache_global = []
 
@@ -42,7 +43,7 @@ def simular_memory_leak(db):
 
     # liberar memoria
     cache_global.clear()
-    import gc
+    
     gc.collect()
     mostrar_memoria(db, "despues de liberar")
 
