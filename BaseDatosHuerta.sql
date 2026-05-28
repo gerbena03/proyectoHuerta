@@ -192,3 +192,5 @@ CREATE TABLE memoria_monitor (
     memoriaMB FLOAT,
     fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
+
+

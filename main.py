@@ -1,5 +1,5 @@
 from database import Database
-from huertaValoracion2 import Horticultura
+from huertaValoracion2 import Horticultura, simular_memory_leak
 
 """Programa para gestionar la BD e iniciar objetos
 de la clase huertaValoracion2"""
@@ -17,7 +17,11 @@ def main():
         "2. OTOÑO- INVIERNO\n"))
         return temporada
     
-    db=Database("localhost", 3306,"root","root","huerta")  
+    
+    db=Database("localhost", 3306,"root","0000","huerta")  
+    
+    simular_memory_leak(db)
+    
     huerta1=Horticultura(principal(),db)
     huerta1.variedadHortaliza(huerta1.getTemporada())
     huerta1.menu2()

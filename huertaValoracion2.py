@@ -4,6 +4,8 @@ from datetime import date
 import psutil
 import os
 
+cache_global = []
+
 
 process = psutil.Process(os.getpid())
 
@@ -23,6 +25,28 @@ def mostrar_memoria(db, momento):
     datos = (momento, memoria)
 
     db.ejecutarConsultas(sql, datos)
+    
+    
+def simular_memory_leak(db):
+
+    global cache_global
+
+    for i in range(1000):
+
+        datos = "cultivo_" * 10000
+
+        cache_global.append(datos)
+
+        if i % 100 == 0:
+            mostrar_memoria(db, f"iteracion_{i}")
+
+    # liberar memoria
+    cache_global.clear()
+    import gc
+    gc.collect()
+    mostrar_memoria(db, "despues de liberar")
+
+    print("Prueba finalizada")
 
 
 """clase que genera objetos hortalizas a sembrar con sus caracteristicas fenologicas 
